@@ -8,7 +8,7 @@
 [ -n "$2" ] && echo 'doasedit: expected only one argument' && exit 0
 [ "$(whoami)" = 'root' ] && echo 'doasedit: cannot be run as root' && exit 0
 
-# if the file contains an extension then that will be used for the temporary file as well
+# if the source file contains an extension then that will be used for the temporary file as well
 dot='.'
 test "${1#*$dot}" != "$1" && temp="$(mktemp --suffix=."${1#*.}")" || temp="$(mktemp)"
 
