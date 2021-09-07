@@ -6,7 +6,6 @@ There are two other `doasedit` implementations on GitHub but somehow they are bo
 
 ## Installation
 
-Perhaps your last time using sudo 😏
 ```sh
-sudo curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit
+doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit
 ```
