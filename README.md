@@ -10,3 +10,11 @@ There are two other `doasedit` implementations on GitHub but somehow they are bo
 doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit && doas chmod +x /usr/bin/doasedit
 ```
 >To uninstall, just run `doas rm /usr/bin/doasedit`
+
+## Issues you may encounter
+
+* It is not 100% necessary but it is recommended that you enable persistence in your doas.conf if you want to create files with doasedit. Personally I don't use it for creating, only for editing but I like persistence nonetheless. To enable persistence, add this line to your doas.conf `permit persist :%wheel`.
+* You should also make sure that your doas.conf is owned by root but you have read permissions. If you have not already done so then use this command:
+```sh
+doas chown -c root:root '/etc/doas.conf' && doas chmod 0444 '/etc/doas.conf'
+```
