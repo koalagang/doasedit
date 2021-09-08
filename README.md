@@ -7,5 +7,6 @@ There are two other `doasedit` implementations on GitHub but somehow they are bo
 ## Installation
 
 ```sh
-doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit
+doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit && doas chmod +x /usr/bin/doasedit
 ```
+>To uninstall, just run `doas rm /usr/bin/doasedit`

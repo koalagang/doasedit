@@ -12,7 +12,7 @@
 dot='.'
 test "${1#*$dot}" != "$1" && temp="$(mktemp --suffix=."${1#*.}")" || temp="$(mktemp)"
 
-cat "$1" > "$temp" && $EDITOR "$temp" # copy the contents of the source file to the temporary file
+cat "$1" > "$temp" && $EDITOR "$temp" || no_edit=1 && [ -n "$no_edit" ] && echo 'doasedit: failed to file' && exit 0 # copy the contents of the source file to the temporary file
 
 cmp "$1" "$temp" -s && echo "doasedit: '$1' unchanged" && exit 0 # if the file is unchanged then exit
 
