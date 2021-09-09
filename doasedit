@@ -7,6 +7,7 @@
 # handle errors
 error () {
     echo "$1" && exit 0
+    echo "$1" && exit 0
 }
 [ -f "$1" ] || no_file=1
 [ -z "$1" ] && error 'doasedit: no file path provided'
@@ -18,17 +19,16 @@ error () {
 # if source file = '/etc/pacman.conf' then
 # the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
 # if there is no extension then it will not contain the extension obviously
+orig_temp="$(mktemp)"
 test "${1#*'.'}" != "$1" &&
-temp="$(mktemp | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@").${1#*.}" ||
-temp="$(mktemp | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@")"
+temp="/var/$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@").${1#*.}" ||
+temp="/var/$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@")"
+mv "$orig_temp" "$temp"
 
 # if the source file does not exist then create a new file and give the temporary file the relevant permissions
 # if the source file does exist then simply copy its contents over to the temporary file
-if [ -z "$no_file" ]; then
-    cat "$1" > "$temp" && $EDITOR "$temp" || error 'doasedit: failed to copy file'
-elif [ -n "$no_file" ]; then
-    $EDITOR "$temp" && doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp" || error 'doasedit: failed to copy file'
-fi
+[ -z "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp" && doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp"
+[ -n "$no_file" ] && $EDITOR "$temp" && doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp"
 
 cmp "$1" "$temp" -s && echo "doasedit: $1 unchanged" && exit 0 # if the file is unchanged then exit
 
