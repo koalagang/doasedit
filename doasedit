@@ -2,26 +2,32 @@
 
 # AUTHOR: koalagang (https://github.com/koalagang)
 # Dependencies: doas
+# You can find the doasedit repository at https://github.com/koalagang/doasedit
 
+# handle errors
 error () {
     echo "$1" && exit 0
 }
-
-# catch arguments
 [ -f "$1" ] || no_file=1
 [ -z "$1" ] && error 'doasedit: no file path provided'
 [ -n "$2" ] && error 'doasedit: expected only one argument'
 [ "$(whoami)" = 'root' ] && error 'doasedit: cannot be run as root'
 [ -w "$1" ] && error 'doasedit: editing files in a writeable directory is not permitted'
 
-# if the source file contains an extension then that will be used for the temporary file as well
-dot='.'
-test "${1#*$dot}" != "$1" && temp="$(mktemp --suffix=."${1#*.}")" || temp="$(mktemp)"
+# create a temporary file which is named with the following format:
+# if source file = '/etc/pacman.conf' then
+# the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
+# if there is no extension then it will not contain the extension obviously
+test "${1#*'.'}" != "$1" &&
+temp="$(mktemp | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@").${1#*.}" ||
+temp="$(mktemp | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@")"
 
+# if the source file does not exist then create a new file and give the temporary file the relevant permissions
+# if the source file does exist then simply copy its contents over to the temporary file
 if [ -z "$no_file" ]; then
     cat "$1" > "$temp" && $EDITOR "$temp" || error 'doasedit: failed to copy file'
 elif [ -n "$no_file" ]; then
-    $EDITOR "$temp" && doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp"
+    $EDITOR "$temp" && doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp" || error 'doasedit: failed to copy file'
 fi
 
 cmp "$1" "$temp" -s && echo "doasedit: $1 unchanged" && exit 0 # if the file is unchanged then exit
