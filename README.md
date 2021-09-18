@@ -9,7 +9,7 @@ doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedi
 ```
 >To uninstall, just run `doas rm /usr/bin/doasedit`
 
-## Issues you may encounter
+## Things you might want to do
 
 * It is not 100% necessary but it is recommended that you enable persistence in your doas.conf for more convenient use. To enable persistence, add the following line to `/etc/doas.conf`:
 ```sh
