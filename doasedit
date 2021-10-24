@@ -6,14 +6,19 @@
 
 # handle errors
 error () {
-    echo "$1" && exit 0
+    echo "doasedit: $1" && exit 0
 }
 
-[ -f "$1" ] || no_file=1
-[ -z "$1" ] && error 'doasedit: no file path provided'
-[ -n "$2" ] && error 'doasedit: expected only one argument'
-[ "$(whoami)" = 'root' ] && error 'doasedit: cannot be run as root'
-[ -w "$1" ] && error 'doasedit: editing files in a writeable directory is not permitted'
+if [ -f "$1" ]; then
+    no_file=1
+elif [ -d "$1" ]; then
+    error "$1: Is a directory"
+fi
+
+[ -z "$1" ] && error 'no file path provided'
+[ -n "$2" ] && error 'expected only one argument'
+[ "$(whoami)" = 'root' ] && error 'cannot be run as root'
+[ -w "$1" ] && error 'editing files in a writeable directory is not permitted'
 
 # create a temporary file which is named with the following format:
 # if source file = '/etc/pacman.conf' then
@@ -30,7 +35,7 @@ mv "$orig_temp" "$temp"
 [ -z "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
 [ -n "$no_file" ] && $EDITOR "$temp"
 
-cmp "$1" "$temp" -s && echo "doasedit: $1 unchanged" && exit 0 # if the file is unchanged then exit
+cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
 
 doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp"
 
