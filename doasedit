@@ -32,14 +32,13 @@ mv "$orig_temp" "$temp"
 
 # if the source file does not exist then create a new file and give the temporary file the relevant permissions
 # if the source file does exist then simply copy its contents over to the temporary file
-[ -z "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
-[ -n "$no_file" ] && $EDITOR "$temp"
+[ -n "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
+[ -z "$no_file" ] && $EDITOR "$temp"
 
 cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
-
-doas chown -c root:root "$temp" >/dev/null && doas chmod 0444 "$temp"
 
 # replace the source file with the temporary file (but retain the name of the source file)
 # repeats if it fails (i.e. the user typed the password in wrong)
 # it only repeats three times because after three failed attempts the user gets blocked from using doas for ten minutes
-doas mv "$temp" "$1" || doas mv "$temp" "$1" || doas mv "$temp" "$1"
+doas mv "$temp" "$1"
+doas chown -c root:root "$1" >/dev/null && doas chmod 0444 "$1"
