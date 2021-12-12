@@ -17,7 +17,7 @@ permit persist :wheel
 ```
 * You should also make sure that `/etc/doas.conf` is owned by root but you have read permissions. If the file is writeable for anyone then you have a ***major*** security vulnerability on your system (anyone can give themselves root privilidges).
 
-* If the source file is not readable then `doasedit` will not work. If you have not already done so then use this command (using `/etc/doas.conf` as the example path):
+* If the source file is not readable then `doasedit` will not work. If you have not already done so then use this command:
 ```sh
-doas chown -c root:root '/path/of/file' && doas chmod 0444 '/path/of/file'
+doas chmod +r '/path/of/file'
 ```
