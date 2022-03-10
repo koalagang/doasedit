@@ -45,4 +45,4 @@ cp "$temp" "$temp.bak" && cp "$temp" "$temp.bak2"
 doas mv "$temp" "$1" || doas mv "$temp.bak" "$1" || doas mv "$temp.bak2" "$1"
 doas chown -c root:root "$1" >/dev/null && doas chmod 0444 "$1"
 # clean up any backups made which didn't get removed
-rm "$temp*"
+rm "$temp"*
