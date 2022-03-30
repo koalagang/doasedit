@@ -11,7 +11,7 @@ doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedi
 
 ## Things you might want to do
 
-* It is not 100% necessary but it is recommended that you enable persistence in your doas.conf for more convenient use. To enable persistence, add the following line to `/etc/doas.conf`:
+* It is not 100% necessary but it is recommended that you enable persistence in your doas.conf for more convenient use. To enable persistence, (provided that you are part of the `wheel` group) add the following line to `/etc/doas.conf`:
 ```sh
 permit persist :wheel
 ```
@@ -21,7 +21,14 @@ You can do this by issuing the following command:
 doas chown -c root:root '/etc/doas.conf' && doas chmod 0444 '/etc/doas.conf'
 ```
 
-* If the source file is not readable then `doasedit` will not work. If you have not already done so then use this command:
+* If the source file is not readable then `doasedit` will not work. You can mark a file as readable with the following command:
 ```sh
 doas chmod +r '/path/of/file'
+```
+>`doas` is only required if the file is owned by root.
+
+* Some software hardcode the use of sudo if they need root privilidges. This issue can be overcome by uninstalling sudo and then symlinking doas to sudo with the following command:
+> Make sure to remove the `sudo` package first.
+```
+doas ln -s /usr/bin/doas /usr/bin/sudo
 ```
