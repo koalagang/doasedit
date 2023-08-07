@@ -20,6 +20,10 @@ fi
 [ "$(whoami)" = 'root' ] && error 'cannot be run as root'
 [ -w "$1" ] && error 'editing files in a writeable directory is not permitted'
 
+# save the original chmod and chown values
+orig_chmod=$(stat --format "%a" "$1")
+orig_chown=$(stat --format "%u:%g" "$1")
+
 # create a temporary file which is named with the following format:
 # if source file = '/etc/pacman.conf' then
 # the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
@@ -43,6 +47,6 @@ cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged 
 # therefore, we create backups
 cp "$temp" "$temp.bak" && cp "$temp" "$temp.bak2"
 doas mv "$temp" "$1" || doas mv "$temp.bak" "$1" || doas mv "$temp.bak2" "$1"
-doas chown root:root "$1" && doas chmod 0444 "$1"
+doas chown "$orig_chown" "$1" && doas chmod "$orig_chmod" "$1"
 # clean up any backups made which didn't get removed
 rm "$temp"*
