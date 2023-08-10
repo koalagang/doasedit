@@ -45,6 +45,7 @@ cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0 # if the file
 # even if it fails, the temp is deleted before it repeats
 # therefore, we create backups
 cp "$temp" "$temp.bak" && cp "$temp" "$temp.bak2"
+doas mv "$temp" "$1" || doas mv "$temp.bak" "$1" || doas mv "$temp.bak2" "$1"
 if [ no_file == 1 ]; then
 	doas chown "$orig_chown" "$1"
 	doas chmod "$orig_chmod" "$1"
