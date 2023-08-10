@@ -38,7 +38,7 @@ temp="$(mktemp -t ${filename%.*}XXX.${filename#*.})"
 [ -n "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
 [ -z "$no_file" ] && $EDITOR "$temp"
 
-cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
+cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
 
 # replace the source file with the temporary file (but retain the name of the source file)
 # repeats if it fails (i.e. the user typed the password in wrong)
