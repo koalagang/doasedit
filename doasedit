@@ -21,8 +21,10 @@ fi
 [ -w "$1" ] && error 'editing files in a writeable directory is not permitted'
 
 # save the original chmod and chown values
-orig_chmod=$(stat --format "%a" "$1")
-orig_chown=$(stat --format "%u:%g" "$1")
+if [ no_file == 1 ]; then
+	orig_chmod=$(stat --format "%a" "$1")
+	orig_chown=$(stat --format "%u:%g" "$1")
+fi
 
 # create a temporary file which is named with the following format:
 # if source file = '/etc/pacman.conf' then
@@ -46,7 +48,12 @@ cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged 
 # even if it fails, the temp is deleted before it repeats
 # therefore, we create backups
 cp "$temp" "$temp.bak" && cp "$temp" "$temp.bak2"
-doas mv "$temp" "$1" || doas mv "$temp.bak" "$1" || doas mv "$temp.bak2" "$1"
-doas chown "$orig_chown" "$1" && doas chmod "$orig_chmod" "$1"
+if [ no_file == 1 ]; then
+	doas chown "$orig_chown" "$1"
+	doas chmod "$orig_chmod" "$1"
+else
+	doas chown root:root "$1"
+	doas chmod 644 "$1"
+fi
 # clean up any backups made which didn't get removed
 rm "$temp"*
