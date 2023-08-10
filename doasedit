@@ -30,11 +30,8 @@ fi
 # if source file = '/etc/pacman.conf' then
 # the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
 # if there is no extension then it will not contain the extension obviously
-orig_temp="$(mktemp)"
-test "${1#*'.'}" != "$1" &&
-temp="/var$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@").${1#*.}" ||
-temp="/var$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@")"
-mv "$orig_temp" "$temp"
+filename=$(basename -- "$1")
+temp="$(mktemp -t ${filename%.*}XXX.${filename#*.})"
 
 # if the source file does not exist then create a new file and give the temporary file the relevant permissions
 # if the source file does exist then simply copy its contents over to the temporary file
