@@ -6,7 +6,7 @@
 
 # handle errors
 error () {
-    echo "doasedit: $1" && exit 0
+    echo "doasedit: $1" && exit 1
 }
 
 if [ -f "$1" ]; then
@@ -20,22 +20,25 @@ fi
 [ "$(whoami)" = 'root' ] && error 'cannot be run as root'
 [ -w "$1" ] && error 'editing files in a writeable directory is not permitted'
 
+# save the original chmod and chown values
+if [ no_file == 1 ]; then
+	orig_chmod=$(stat --format "%a" "$1")
+	orig_chown=$(stat --format "%u:%g" "$1")
+fi
+
 # create a temporary file which is named with the following format:
 # if source file = '/etc/pacman.conf' then
 # the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
 # if there is no extension then it will not contain the extension obviously
-orig_temp="$(mktemp)"
-test "${1#*'.'}" != "$1" &&
-temp="/var$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@").${1#*.}" ||
-temp="/var$(echo "$orig_temp" | sed "s@/tmp/tmp.@/tmp/"$(echo "${1%%.*}" | awk -F'/' '{print $NF}')"@")"
-mv "$orig_temp" "$temp"
+filename=$(basename -- "$1")
+temp="$(mktemp -t ${filename%.*}XXX.${filename#*.})"
 
 # if the source file does not exist then create a new file and give the temporary file the relevant permissions
 # if the source file does exist then simply copy its contents over to the temporary file
 [ -n "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
 [ -z "$no_file" ] && $EDITOR "$temp"
 
-cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
+cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
 
 # replace the source file with the temporary file (but retain the name of the source file)
 # repeats if it fails (i.e. the user typed the password in wrong)
@@ -43,6 +46,12 @@ cmp "$1" "$temp" -s && echo "$1 unchanged" && exit 0 # if the file is unchanged 
 # therefore, we create backups
 cp "$temp" "$temp.bak" && cp "$temp" "$temp.bak2"
 doas mv "$temp" "$1" || doas mv "$temp.bak" "$1" || doas mv "$temp.bak2" "$1"
-doas chown root:root "$1" && doas chmod 0444 "$1"
+if [ no_file == 1 ]; then
+	doas chown "$orig_chown" "$1"
+	doas chmod "$orig_chmod" "$1"
+else
+	doas chown root:root "$1"
+	doas chmod 644 "$1"
+fi
 # clean up any backups made which didn't get removed
 rm "$temp"*
