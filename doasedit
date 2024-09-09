@@ -24,13 +24,16 @@ fi
 # if source file = '/etc/pacman.conf' then
 # the temporary file with be '/tmp/pacmanxyz.conf' where xyz is a random string of letters and numbers
 # if there is no extension then it will not contain the extension obviously
-filename=$(basename -- "$1")
-temp="$(mktemp -t ${filename%.*}XXX.${filename#*.})"
+filename="$(basename -- "$1")"
+temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 
 # if the source file does not exist then create a new file and give the temporary file the relevant permissions
 # if the source file does exist then simply copy its contents over to the temporary file
-[ -n "$no_file" ] && cat "$1" > "$temp" && $EDITOR "$temp"
-[ -z "$no_file" ] && $EDITOR "$temp"
+if [ -n "$no_file" ]; then
+    cat "$1" > "$temp" && $EDITOR "$temp"
+else
+    $EDITOR "$temp"
+fi
 
 cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
 
