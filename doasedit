@@ -31,12 +31,12 @@ temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 if [ -n "$file_exists" ]; then
     cat "$1" >"$temp" && ${EDITOR:-vi} "$temp"
     # if the file is unchanged then exit
-    cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0
+    cmp "$1" "$temp" -s && rm "$temp" && echo "doasedit: $1 unchanged" && exit 0
 # if the source file does not exist then create a new file
 else
     ${EDITOR:-vi} "$temp"
-    # exit if file is empty
-    [ -s "$temp" ] || exit 0
+    # clean up and exit if file is empty
+    ! [ -s "$temp" ] && echo "doasedit: $1 not written" && rm -rf "$temp" && exit 0
 fi
 
 # copy the contents of temporary file into the source file
