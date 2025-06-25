@@ -5,12 +5,12 @@
 # You can find the doasedit repository at https://github.com/koalagang/doasedit
 
 # handle errors
-error () {
+error() {
     echo "doasedit: $1" && exit 1
 }
 
 if [ -f "$1" ]; then
-    no_file=1
+    file_exists=1
 elif [ -d "$1" ]; then
     error "$1: Is a directory"
 fi
@@ -27,15 +27,17 @@ fi
 filename="$(basename -- "$1")"
 temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 
-# if the source file does not exist then create a new file and give the temporary file the relevant permissions
-# if the source file does exist then simply copy its contents over to the temporary file
-if [ -n "$no_file" ]; then
-    cat "$1" > "$temp" && $EDITOR "$temp"
+# if the source file does exist then copy its contents over to the temporary file
+if [ -n "$file_exists" ]; then
+    cat "$1" >"$temp" && $EDITOR "$temp"
+    # if the file is unchanged then exit
+    cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0
+# if the source file does not exist then create a new file
 else
     $EDITOR "$temp"
+    # exit if file is empty
+    [ -s "$temp" ] || exit 0
 fi
-
-cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0 # if the file is unchanged then exit
 
 # copy the contents of temporary file into the source file
 # attempt three times in case the user mistypes the root password
