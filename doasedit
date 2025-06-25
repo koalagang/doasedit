@@ -29,12 +29,12 @@ temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 
 # if the source file does exist then copy its contents over to the temporary file
 if [ -n "$file_exists" ]; then
-    cat "$1" >"$temp" && $EDITOR "$temp"
+    cat "$1" >"$temp" && ${EDITOR:-vi} "$temp"
     # if the file is unchanged then exit
     cmp "$1" "$temp" -s && rm "$temp" && echo "$1 unchanged" && exit 0
 # if the source file does not exist then create a new file
 else
-    $EDITOR "$temp"
+    ${EDITOR:-vi} "$temp"
     # exit if file is empty
     [ -s "$temp" ] || exit 0
 fi
