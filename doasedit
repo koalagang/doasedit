@@ -1,7 +1,7 @@
 #!/bin/sh
 
-# AUTHOR: koalagang (https://github.com/koalagang)
-# Dependencies: doas
+# AUTHOR: koalagang (https://github.com/koalagang) and other contributors
+# Dependencies: doas, GNU coreutils, GNU diffutils, an editor
 # You can find the doasedit repository at https://github.com/koalagang/doasedit
 
 # handle errors
