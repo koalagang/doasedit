@@ -6,7 +6,7 @@
 
 # handle errors
 error() {
-    echo "doasedit: $1" && exit 1
+    echo "doasedit: error: $1" && exit 1
 }
 
 if [ -f "$1" ]; then
@@ -41,7 +41,10 @@ fi
 
 # copy the contents of temporary file into the source file
 # attempt three times in case the user mistypes the root password
-doas dd if="$temp" of="$1" >/dev/null 2>&1 || doas dd if="$temp" of="$1" >/dev/null 2>&1 || doas dd if="$temp" of="$1" >/dev/null 2>&1
+write_file() {
+    doas dd if="$temp" of="$1" status=none
+}
+write_file "$1" || write_file "$1" || write_file "$1"
 
 # cleanup
 rm -rf "$temp"
