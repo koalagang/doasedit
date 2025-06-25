@@ -3,6 +3,8 @@
 sudoedit is pretty nice but [sudo is insecure](https://www.youtube.com/watch?v=eamEZCj-CuQ) and [has had many vulnerabilities over the years](https://duckduckgo.com/?q=sudo+vulnerability), which is why, if you are on GNU/Linux, you should switch to [doas](https://github.com/nholstein/OpenDoas). Most BSD users probably already use doas.
 
 ## Installation
+Dependencies: doas, GNU coreutils, GNU diffutils and an editor of your choice (make sure to set the `$EDITOR`
+environmental variable in your shell).
 
 ```sh
 doas curl -sL "https://raw.githubusercontent.com/koalagang/doasedit/main/doasedit" -o /usr/bin/doasedit && doas chmod +x /usr/bin/doasedit
