@@ -36,15 +36,15 @@ if [ -n "$file_exists" ]; then
 else
     ${EDITOR:-vi} "$temp"
     # clean up and exit if file is empty
-    ! [ -s "$temp" ] && echo "doasedit: $1 not written" && rm -rf "$temp" && exit 0
+    ! [ -s "$temp" ] && echo "doasedit: $1 not written" && rm "$temp" && exit 0
 fi
 
 # copy the contents of temporary file into the source file
 # attempt three times in case the user mistypes the root password
 write_file() {
-    doas dd if="$temp" of="$1" status=none
+    ${DOASEDIT:-doas} dd if="$temp" of="$1" status=none
 }
 write_file "$1" || write_file "$1" || write_file "$1"
 
 # cleanup
-rm -rf "$temp"
+rm "$temp"
