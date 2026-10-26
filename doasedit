@@ -27,6 +27,9 @@ fi
 filename="$(basename -- "$1")"
 temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 
+# cleanup on exit
+trap 'rm "$temp"' EXIT INT TERM SIGHUP SIGQUIT
+
 # if the source file does exist then copy its contents over to the temporary file
 if [ -n "$file_exists" ]; then
     cat "$1" >"$temp" && ${EDITOR:-vi} "$temp"
@@ -45,6 +48,3 @@ write_file() {
     ${DOASEDIT:-doas} dd if="$temp" of="$1" status=none
 }
 write_file "$1" || write_file "$1" || write_file "$1"
-
-# cleanup
-rm "$temp"
