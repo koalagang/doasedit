@@ -28,7 +28,7 @@ filename="$(basename -- "$1")"
 temp="$(mktemp -t "${filename%.*}"XXX."${filename#*.}")"
 
 # cleanup on exit
-trap 'rm -f "$temp"' EXIT INT TERM SIGHUP SIGQUIT
+trap 'rm -f "$temp"' EXIT INT TERM HUP QUIT
 
 # if the source file does exist then copy its contents over to the temporary file
 if [ -n "$file_exists" ]; then
